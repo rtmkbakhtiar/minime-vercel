@@ -39,7 +39,7 @@ const OpenGraphPreview: React.FC<OpenGraphPreviewProps> = ({
 	const [isImageError, setIsImageError] = useState<boolean>(false);
 
 	const handleImageError = () => setIsImageError(true);
-
+	// console.log(image, 'imageimage');
 	const renderImage = () => {
 		const imageSize =
       'flex-shrink-0 relative overflow-hidden rounded-lg lg:h-[90px] lg:w-[90px] w-[60px] h-[60px]';

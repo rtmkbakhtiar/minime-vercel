@@ -520,7 +520,11 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
 					<OpenGraphPreview
 						className='pt-4 pl-4 pr-9'
 						loading={ loadingTempOpenGraphInput }
-						image={ tempOpenGraphInput?.ogImage?.[0]?.url }
+						image={
+							typeof tempOpenGraphInput?.ogImage === 'string'
+							  ? tempOpenGraphInput.ogImage
+							  : tempOpenGraphInput?.ogImage?.[0]?.url
+						  }
 						url={ tempOpenGraphInput?.ogUrl || tempOpenGraphInput?.url }
 						title={
 							tempOpenGraphInput?.ogTitle ??

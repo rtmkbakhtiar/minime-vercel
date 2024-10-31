@@ -39,6 +39,7 @@ const nextConfig = {
         hostname: '*.googleusercontent.com',
       },
     ],
+    domains: ['img.youtube.com', 'i.ytimg.com'],
   },
 };
 
