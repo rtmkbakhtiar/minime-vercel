@@ -43,24 +43,24 @@ export default async function handler(
 		};
         
 		// // For YouTube specifically
-		// if (url.includes('youtube.com') || url.includes('youtu.be')) {
-		// 	// Get video ID
-		// 	const videoId = url.includes('youtu.be')
-		// 		? url.split('/').pop()
-		// 		: new URL(url).searchParams.get('v');
+		if (url.includes('youtube.com') || url.includes('youtu.be')) {
+			// Get video ID
+			const videoId = url.includes('youtu.be')
+				? url.split('/').pop()
+				: new URL(url).searchParams.get('v');
 
-		// 	// Use YouTube oEmbed API as backup
-		// 	try {
-		// 		const oembedResponse = await axios.get(
-		// 			`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`
-		// 		);
+			// Use YouTube oEmbed API as backup
+			try {
+				const oembedResponse = await axios.get(
+					`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`
+				);
         
-		// 		ogData.ogTitle = ogData.ogTitle || oembedResponse.data.title;
-		// 		ogData.ogImage = ogData.ogImage || [{ url: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` }];
-		// 	} catch (oembedError) {
-		// 		console.error('oEmbed fallback failed:', oembedError);
-		// 	}
-		// }
+				ogData.ogTitle = ogData.ogTitle || oembedResponse.data.title;
+				ogData.ogImage = ogData.ogImage || [{ url: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` }];
+			} catch (oembedError) {
+				console.error('oEmbed fallback failed:', oembedError);
+			}
+		}
         
 		return res.status(200).json(ogData);
     
