@@ -41,6 +41,7 @@
     "sharp": "^0.33.2",
     "tailwind-merge": "^2.0.0",
     "tailwindcss-animate": "^1.0.7",
+    "url-metadata": "^4.1.1",
     "yup": "^1.4.0"
   },
   "devDependencies": {

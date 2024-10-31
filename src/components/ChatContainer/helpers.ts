@@ -37,7 +37,7 @@ export const handleOpenGraphScrapping = async(url?: string) => {
 	if (!url) return null;
 
 	try {
-		const ogResponse = await axios.post<OgObject>('/api/metadata', {
+		const ogResponse = await axios.post<OgObject>('/api/metadata-url', {
 			url: url,
 		});
 

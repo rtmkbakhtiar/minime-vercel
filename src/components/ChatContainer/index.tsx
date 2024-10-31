@@ -513,6 +513,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
 	};
 
 	const renderOpenGraphPreview = () => {
+		
 		if (tempOpenGraphInput?.show || loadingTempOpenGraphInput) {
 			return (
 				<div className='absolute bottom-full w-full -z-10 bg-neutral-background shadow-input-focus rounded-t-2xl pb-9 -mb-5'>
