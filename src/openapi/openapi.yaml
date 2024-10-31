@@ -1,0 +1,1764 @@
+openapi: 3.0.0
+info:
+  title: Networkly Chat Rest API
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:3000'
+    description: Local Server run on port 3000
+  - url: 'https://stage.minime.club'
+    description: Development Server
+paths:
+  /v1/auth:
+    post:
+      summary: register
+      operationId: register
+      description: register new user
+      tags:
+        - auth
+      requestBody:
+        description: register new user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterReq'
+      responses:
+        '200':
+          description: register success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'APP:SUCCESS | ERR:VALIDATION'
+                  stat_msg:
+                    type: string
+                    example: success
+                  pagination:
+                    type: object
+                  data:
+                    $ref: '#/components/schemas/RegisterResp'
+        '400':
+          $ref: '#/components/responses/Other200'
+        '403':
+          description: ../common/resp/other_200.yaml
+        '404':
+          description: ../common/resp/other_200.yaml
+        '500':
+          description: ../common/resp/other_200.yaml
+        default:
+          $ref: '#/components/responses/Other200'
+  /v1/auth/admin:
+    post:
+      summary: adminLogin
+      operationId: adminLogin
+      description: admin login to dashboard
+      tags:
+        - auth
+      requestBody:
+        description: admin login to dashboard
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminLoginReq'
+      responses:
+        '200':
+          description: login success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'APP:SUCCESS | ERR:VALIDATION'
+                  stat_msg:
+                    type: string
+                    example: success
+                  pagination:
+                    type: object
+                  data:
+                    $ref: '#/components/schemas/AdminLoginResp'
+        '400':
+          $ref: '#/components/responses/Other200'
+        '403':
+          description: ../common/resp/other_200.yaml
+        '404':
+          description: ../common/resp/other_200.yaml
+        '500':
+          description: ../common/resp/other_200.yaml
+        default:
+          $ref: '#/components/responses/Other200'
+  /v1/bots:
+    get:
+      summary: BotManagement
+      operationId: getBot
+      description: get bots
+      tags:
+        - bot
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/status'
+        - $ref: '#/components/parameters/next'
+        - $ref: '#/components/parameters/prev'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'ERR:BAD_REQUEST | ERR:VALIDATION | ERR:AUTHENTICATION'
+                  stat_msg:
+                    type: string
+                    example: can be a custom message
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BotResp'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        default:
+          $ref: '#/components/responses/Other200'
+    post:
+      summary: create bot
+      operationId: create bot
+      description: create bot
+      tags:
+        - bot
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: create bot
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - q_bot_desc
+                - q_best_descibe
+                - q_is_your_own
+              properties:
+                q_bot_desc:
+                  type: string
+                  example: bot describe
+                  description: bot describe
+                q_best_descibe:
+                  type: string
+                  example: student
+                  description: best describe
+                q_is_your_own:
+                  type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/Other200'
+        '400':
+          $ref: '#/components/responses/Other200'
+        '403':
+          description: ../common/resp/other_200.yaml
+        '404':
+          description: ../common/resp/other_200.yaml
+        '500':
+          description: ../common/resp/other_200.yaml
+        default:
+          $ref: '#/components/responses/Other200'
+  '/v1/bots/{strCode}':
+    get:
+      summary: BotManagement
+      operationId: getBotDetail
+      description: get bot details
+      tags:
+        - bot
+      parameters:
+        - $ref: '#/components/parameters/code'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'ERR:BAD_REQUEST | ERR:VALIDATION | ERR:AUTHENTICATION'
+                  stat_msg:
+                    type: string
+                    example: can be a custom message
+                  data:
+                    $ref: '#/components/schemas/BotResp'
+        default:
+          $ref: '#/components/responses/Other200'
+    put:
+      summary: update bot
+      operationId: update bot
+      description: will be use for activate the bot
+      tags:
+        - bot
+      parameters:
+        - $ref: '#/components/parameters/code'
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: update bot / activate bot
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBotReq'
+      responses:
+        '200':
+          $ref: '#/components/responses/Other200'
+        '400':
+          $ref: '#/components/responses/Other200'
+        '403':
+          description: ../common/resp/other_200.yaml
+        '404':
+          description: ../common/resp/other_200.yaml
+        '500':
+          description: ../common/resp/other_200.yaml
+        default:
+          $ref: '#/components/responses/Other200'
+  '/v1/bots/{strCode}/convs':
+    get:
+      summary: get conversation
+      operationId: getConversation
+      description: get conversations of bot
+      tags:
+        - conversation
+      parameters:
+        - $ref: '#/components/parameters/code'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/next'
+        - $ref: '#/components/parameters/prev'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'ERR:BAD_REQUEST | ERR:VALIDATION | ERR:AUTHENTICATION'
+                  stat_msg:
+                    type: string
+                    example: can be a custom message
+                  data:
+                    $ref: '#/components/schemas/ConvArrResp'
+        default:
+          $ref: '#/components/responses/Other200'
+  '/v1/bots/{strCode}/init-convs':
+    get:
+      summary: initiate convertation
+      operationId: initConversation
+      description: get conversations of bot
+      tags:
+        - conversation
+      parameters:
+        - $ref: '#/components/parameters/code'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'ERR:BAD_REQUEST | ERR:VALIDATION | ERR:AUTHENTICATION'
+                  stat_msg:
+                    type: string
+                    example: can be a custom message
+                  data:
+                    $ref: '#/components/schemas/InitConvResp'
+        default:
+          $ref: '#/components/responses/Other200'
+  '/v1/bots/{strCode}/convs/{strConvCode}/chats':
+    get:
+      summary: get conversationDetail
+      operationId: getConversationDetail
+      description: get conversation detail (chat)
+      tags:
+        - conversation
+      parameters:
+        - $ref: '#/components/parameters/code'
+        - $ref: '#/components/parameters/convCode'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/next'
+        - $ref: '#/components/parameters/prev'
+        - $ref: '#/components/parameters/sort'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'ERR:BAD_REQUEST | ERR:VALIDATION | ERR:AUTHENTICATION'
+                  stat_msg:
+                    type: string
+                    example: can be a custom message
+                  data:
+                    $ref: '#/components/schemas/MsgArrResp'
+        default:
+          $ref: '#/components/responses/Other200'
+    post:
+      summary: submitChat
+      operationId: submitChat
+      description: submit hat
+      tags:
+        - conversation
+      parameters:
+        - $ref: '#/components/parameters/code'
+        - $ref: '#/components/parameters/convCode'
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: submit hat body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MsgReq'
+      responses:
+        '200':
+          $ref: '#/components/responses/Other200'
+        default:
+          $ref: '#/components/responses/Other200'
+  '/v1/bots/{strCode}/convs/{strConvCode}/chats/{strMsgCode}/feedback':
+    put:
+      summary: submitFeedback
+      operationId: submitFeedback
+      description: submit feedback for bot answer
+      tags:
+        - conversation
+      parameters:
+        - $ref: '#/components/parameters/code'
+        - $ref: '#/components/parameters/convCode'
+        - $ref: '#/components/parameters/msgCode'
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: submit hat body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MsgFeebackReq'
+      responses:
+        '200':
+          $ref: '#/components/responses/Other200'
+        default:
+          $ref: '#/components/responses/Other200'
+  '/v1/bots/{strCode}/convs/{strConvCode}/chats/{strMsgCode}/rating':
+    put:
+      summary: submitRating
+      operationId: submitRating
+      description: submit Rating for bot answer
+      tags:
+        - conversation
+      parameters:
+        - $ref: '#/components/parameters/code'
+        - $ref: '#/components/parameters/convCode'
+        - $ref: '#/components/parameters/msgCode'
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: submit hat body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MsgRatingReq'
+      responses:
+        '200':
+          $ref: '#/components/responses/Other200'
+        default:
+          $ref: '#/components/responses/Other200'
+  /v1/bots/main-bot:
+    get:
+      summary: MainBotManagement
+      operationId: getMainBot
+      description: get main bots
+      tags:
+        - main_bot
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/sort'
+        - name: is_online
+          in: query
+          description: for filter is online bot 1 or 0
+          required: false
+          schema:
+            type: string
+            example: 1 or 0
+        - name: is_featured_bot
+          in: query
+          description: for filter is featured bot 1 or 0
+          required: false
+          schema:
+            type: string
+            example: 1 or 0
+        - $ref: '#/components/parameters/next'
+        - $ref: '#/components/parameters/prev'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'ERR:BAD_REQUEST | ERR:VALIDATION | ERR:AUTHENTICATION'
+                  stat_msg:
+                    type: string
+                    example: can be a custom message
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MainBotResp'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        default:
+          $ref: '#/components/responses/Other200'
+  '/v1/bots/main-bot/{strCode}':
+    get:
+      summary: MainBotManagement
+      operationId: getMainBotDetail
+      description: get main bot details
+      tags:
+        - main_bot
+      parameters:
+        - $ref: '#/components/parameters/code'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'ERR:BAD_REQUEST | ERR:VALIDATION | ERR:AUTHENTICATION'
+                  stat_msg:
+                    type: string
+                    example: can be a custom message
+                  data:
+                    $ref: '#/components/schemas/MainBotResp'
+        default:
+          $ref: '#/components/responses/Other200'
+  /v1/bots/chat-history:
+    get:
+      summary: getListChatHistory
+      operationId: getListChatHistory
+      description: get list chat history
+      tags:
+        - bot
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order_by'
+        - $ref: '#/components/parameters/next'
+        - $ref: '#/components/parameters/prev'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'ERR:BAD_REQUEST | ERR:VALIDATION | ERR:AUTHENTICATION'
+                  stat_msg:
+                    type: string
+                    example: can be a custom message
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ChatHistoryBotResp'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        default:
+          $ref: '#/components/responses/Other200'
+  /v1/app/settings:
+    get:
+      summary: AppSetting
+      operationId: getAppSetting
+      description: get application general settings
+      tags:
+        - app
+      security:
+        - {}
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/group'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'ERR:BAD_REQUEST | ERR:VALIDATION | ERR:AUTHENTICATION'
+                  stat_msg:
+                    type: string
+                    example: can be a custom message
+                  data:
+                    type: object
+                    properties:
+                      feedbacks:
+                        type: array
+                        items:
+                          type: string
+                          properties:
+                            feedback:
+                              type: string
+                              example: feedback name
+        default:
+          $ref: '#/components/responses/Other200'
+  /v1/subscribe-plan:
+    get:
+      summary: getListSubscribePlan
+      operationId: GetListSubscribePlan
+      description: get list subscribe plan
+      tags:
+        - subscribe
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order_by'
+        - $ref: '#/components/parameters/bot_code'
+        - $ref: '#/components/parameters/is_active'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'ERR:BAD_REQUEST | ERR:VALIDATION | ERR:AUTHENTICATION'
+                  stat_msg:
+                    type: string
+                    example: can be a custom message
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubscribePlanResp'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        default:
+          $ref: '#/components/responses/Other200'
+    post:
+      summary: createSubscribePlan
+      operationId: createSubscribePlan
+      description: create subscribe plan
+      tags:
+        - subscribe
+      requestBody:
+        description: create subscribe plan
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscribePlanReq'
+      responses:
+        '200':
+          description: create subscribe plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'APP:SUCCESS | ERR:VALIDATION'
+                  stat_msg:
+                    type: string
+                    example: success
+                  pagination:
+                    type: object
+                  data:
+                    $ref: '#/components/schemas/SubscribePlanResp'
+        '400':
+          $ref: '#/components/responses/Other200'
+        '403':
+          description: ../common/resp/other_200.yaml
+        '404':
+          description: ../common/resp/other_200.yaml
+        '500':
+          description: ../common/resp/other_200.yaml
+        default:
+          $ref: '#/components/responses/Other200'
+  '/v1/subscribe-plan/{strCode}':
+    get:
+      summary: Get Subscription Plans
+      operationId: GetSubscribePlanDetail
+      description: Retrieve details of a subscription plan for a bot
+      tags:
+        - subscribe
+      parameters:
+        - $ref: '#/components/parameters/code'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'SUCCESS | ERR:NOT_FOUND | ERR:VALIDATION'
+                  stat_msg:
+                    type: string
+                    example: can be a custom message
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubscribePlanResp'
+        default:
+          $ref: '#/components/responses/Other200'
+    put:
+      summary: Update Subscription Plan is active
+      operationId: UpdateIsActiveSubscribePlan
+      description: Update is active of a subscription plan for a bot
+      tags:
+        - subscription
+      parameters:
+        - $ref: '#/components/parameters/code'
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Update subscription plan is active
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_active:
+                  type: boolean
+                  default: true
+      responses:
+        '200':
+          $ref: '#/components/responses/Other200'
+        '400':
+          $ref: '#/components/responses/Other200'
+        '403':
+          description: ../common/resp/other_200.yaml
+        '404':
+          description: ../common/resp/other_200.yaml
+        '500':
+          description: ../common/resp/other_200.yaml
+        default:
+          $ref: '#/components/responses/Other200'
+  '/v1/subscribe-plan/{intID}/price':
+    put:
+      summary: Update price Subscription Plan
+      operationId: UpdatePriceSubscribePlan
+      description: Update price of subscription plan for a bot
+      tags:
+        - subscription
+      parameters:
+        - $ref: '#/components/parameters/intID'
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Update price of subscription plan
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                price:
+                  type: number
+                  format: float
+                  description: Price of the subscription plan
+                  example: 19.99
+      responses:
+        '200':
+          $ref: '#/components/responses/Other200'
+        '400':
+          $ref: '#/components/responses/Other200'
+        '403':
+          description: ../common/resp/other_200.yaml
+        '404':
+          description: ../common/resp/other_200.yaml
+        '500':
+          description: ../common/resp/other_200.yaml
+        default:
+          $ref: '#/components/responses/Other200'
+  /v1/user-subscription:
+    get:
+      summary: getListUserSubscription
+      operationId: GetListUserSubscription
+      description: get list user subscription plan
+      tags:
+        - subscribe
+        - user
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order_by'
+        - $ref: '#/components/parameters/next'
+        - $ref: '#/components/parameters/prev'
+        - $ref: '#/components/parameters/status'
+        - $ref: '#/components/parameters/is_active'
+        - $ref: '#/components/parameters/profile_code'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'ERR:BAD_REQUEST | ERR:VALIDATION | ERR:AUTHENTICATION'
+                  stat_msg:
+                    type: string
+                    example: can be a custom message
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserSubscriptionResp'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        default:
+          $ref: '#/components/responses/Other200'
+    post:
+      summary: Create User Subscription
+      operationId: CreateUserSubscription
+      description: Creates a user subscription
+      tags:
+        - subscription
+        - user
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Details for the new user subscription
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profiles_code:
+                  type: string
+                  description: Profile code associated with the subscription
+                  example: u0n8jgoe4
+                amount:
+                  type: number
+                  format: float
+                  example: 19.99
+                  description: The amount paid for the subscription
+                bot_code:
+                  type: string
+                  description: Code of the bot
+                bot_types:
+                  type: string
+                  description: 'Types of the bot, either bot or main bot'
+                  example: main bot
+                payment_date:
+                  type: string
+                  format: date-time
+                  example: '2024-09-17T12:34:56Z'
+                  description: The date and time the payment was made
+                stripe_payment_id:
+                  type: string
+                  example: pi_1F5GSUBXwfi33K
+                  description: The Stripe payment identifier
+                transaction_id:
+                  type: string
+                  description: Payment identifier for tracking the transaction
+                start_time:
+                  type: string
+                  format: date-time
+                  example: '2024-09-17T00:00:00Z'
+                  description: When the subscription starts
+                end_time:
+                  type: string
+                  format: date-time
+                  example: '2024-10-17T00:00:00Z'
+                  description: When the subscription ends
+                status:
+                  type: string
+                  example: active
+                  description: 'The current status of the subscription (e.g., active, expired)'
+                plan:
+                  type: integer
+                  example: 1
+                plan_names:
+                  type: string
+                created_at:
+                  type: string
+                  format: date-time
+                  example: '2024-09-17T12:00:00Z'
+                  description: When the subscription was created
+                updated_at:
+                  type: string
+                  format: date-time
+                  example: '2024-09-17T12:30:00Z'
+                  description: When the subscription was last updated
+      responses:
+        '200':
+          description: create subscribe plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'APP:SUCCESS | ERR:VALIDATION'
+                  stat_msg:
+                    type: string
+                    example: success
+                  pagination:
+                    type: object
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: The Stripe payment identifier
+                      url:
+                        type: string
+                        description: Url hosting stripe
+        '400':
+          $ref: '#/components/responses/Other200'
+        '403':
+          $ref: '#/components/responses/Other200'
+        '404':
+          $ref: '#/components/responses/Other200'
+        '500':
+          $ref: '#/components/responses/Other200'
+        default:
+          $ref: '#/components/responses/Other200'
+  '/v1/user-subscription/{strCode}':
+    put:
+      summary: Update User Subscription
+      operationId: UpdateUserSubscription
+      description: 'Update the details of a subscription plan for a bot, marking it as successful.'
+      tags:
+        - subscription
+      parameters:
+        - $ref: '#/components/parameters/code'
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Details for updating the subscription plan.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profiles_code:
+                  type: string
+                  description: Code of the profile associated with the subscription.
+                amount:
+                  type: number
+                  format: float
+                  description: Amount paid for the subscription.
+                  example: 19.99
+                bot_code:
+                  type: string
+                bot_types:
+                  type: string
+                  description: 'Types of the bot, either bot or main bot'
+                  example: main bot
+                payment_date:
+                  type: string
+                  format: date-time
+                  description: Timestamp when the payment was made.
+                  example: '2024-09-17T12:34:56Z'
+                stripe_payment_id:
+                  type: string
+                  description: Stripe payment identifier for tracking the transaction.
+                plan_names:
+                  type: string
+                transaction_id:
+                  type: string
+                  description: Payment identifier for tracking the transaction
+                start_time:
+                  type: string
+                  format: date-time
+                  description: Timestamp indicating when the subscription starts.
+                  example: '2024-09-17T00:00:00Z'
+                end_time:
+                  type: string
+                  format: date-time
+                  description: Timestamp indicating when the subscription ends.
+                  example: '2024-10-17T00:00:00Z'
+                status:
+                  type: string
+                  description: 'Status of the subscription, e.g., success, pending, failed.'
+                plan:
+                  type: integer
+                  description: The plan type associated with the subscription.
+                  example: 1
+      responses:
+        '200':
+          $ref: '#/components/responses/Other200'
+        '400':
+          $ref: '#/components/responses/Other200'
+        '403':
+          description: ../common/resp/other_200.yaml
+        '404':
+          description: ../common/resp/other_200.yaml
+        '500':
+          description: ../common/resp/other_200.yaml
+        default:
+          $ref: '#/components/responses/Other200'
+  '/v1/user-subscription/{strConvCode}/bot/{strCode}':
+    get:
+      summary: CheckUserSubscriptionDetail
+      operationId: CheckUserSubscriptionDetail
+      description: check user subscription status
+      tags:
+        - user
+        - subscription
+      parameters:
+        - $ref: '#/components/parameters/code'
+        - $ref: '#/components/parameters/convCode'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat_code:
+                    type: string
+                    example: 'ERR:BAD_REQUEST | ERR:VALIDATION | ERR:AUTHENTICATION'
+                  stat_msg:
+                    type: string
+                    example: can be a custom message
+                  data:
+                    $ref: '#/components/schemas/CheckUserSubscriptionResp'
+        default:
+          $ref: '#/components/responses/Other200'
+components:
+  parameters:
+    limit:
+      name: limit
+      in: query
+      description: how many items to return at one time (max 100)
+      required: true
+      schema:
+        type: integer
+        format: int32
+    page:
+      name: page
+      in: query
+      description: the current page of items (for pagination)
+      required: true
+      schema:
+        type: integer
+        format: int32
+    act:
+      name: act
+      in: query
+      description: query string for action process
+      required: false
+      schema:
+        type: string
+    group:
+      name: group
+      in: query
+      description: query string for filter by group name
+      required: false
+      schema:
+        type: string
+    latest:
+      name: latest
+      in: query
+      description: for calculate data next page (for pagination)
+      required: false
+      schema:
+        type: string
+    sort:
+      name: sort
+      in: query
+      description: for sort like desc or asc
+      required: false
+      schema:
+        type: string
+    status:
+      name: status
+      in: query
+      description: for filter status bot
+      required: false
+      schema:
+        type: string
+    next:
+      name: next
+      in: query
+      description: parameter next
+      required: false
+      schema:
+        type: string
+    prev:
+      name: prev
+      in: query
+      description: parameter prev
+      required: false
+      schema:
+        type: string
+    order_by:
+      name: order_by
+      in: query
+      description: order data by name or other default latest_msg_at
+      required: false
+      schema:
+        type: string
+    bot_code:
+      name: bot_code
+      in: query
+      description: for filter bot_code who have subscribe plan
+      required: false
+      schema:
+        type: string
+    is_active:
+      name: is_active
+      in: query
+      description: Filter the subscribe plans by their active status. Use `true` for active and `false` for inactive.
+      required: false
+      schema:
+        type: string
+    profile_code:
+      name: profile_code
+      in: query
+      description: for filter profile_code who have subscribe plan
+      required: false
+      schema:
+        type: string
+    intID:
+      name: intID
+      in: path
+      required: true
+      description: the id of rosources data
+      schema:
+        type: integer
+    code:
+      name: strCode
+      in: path
+      required: true
+      description: code key for all items
+      schema:
+        type: string
+    convCode:
+      name: strConvCode
+      in: path
+      required: true
+      description: code key for Conv code
+      schema:
+        type: string
+    msgCode:
+      name: strMsgCode
+      in: path
+      required: true
+      description: code key for message code
+      schema:
+        type: string
+  schemas:
+    Pagination:
+      type: object
+      properties:
+        prev:
+          type: string
+          example: previous page
+        next:
+          type: string
+          example: next page
+        total_bots:
+          type: integer
+          example: 5
+        total_messages:
+          type: integer
+          example: 15
+        total_subsctibe_plans:
+          type: integer
+          example: 15
+    BotTag:
+      type: string
+      properties:
+        name:
+          type: string
+          example: Lifestyle
+    BotResp:
+      type: object
+      properties:
+        creator_name:
+          type: string
+          example: creator name of bot
+        code:
+          type: string
+          example: BOT-001
+        name:
+          type: string
+          example: 'Sosan, susy, johnlee'
+        bot_alias:
+          type: string
+        avatar:
+          type: string
+          example: 'https://url_of.cdn'
+        description:
+          type: string
+        short_description:
+          type: string
+        meta_title:
+          type: string
+          example: SimplySosan MiniMe
+        meta_description:
+          type: string
+        meta_image:
+          type: string
+          example: 'https://networkydev.s3.us-west-2.amazonaws.com/meta/sosan_thumbnail.jpeg'
+        is_online:
+          type: boolean
+        req_status:
+          type: integer
+          example: '0=new, 1=accepted, 2=declined'
+        welcome_msg:
+          type: string
+          example: bot welcome messages
+        created_at:
+          type: string
+          example: '2024-01-01 12:59:00'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/BotTag'
+    UpdateBotReq:
+      type: object
+      required:
+        - api_url
+        - avatar
+        - bot_alias
+        - description
+        - short_description
+        - meta_title
+        - meta_description
+        - meta_image
+        - is_online
+        - req_status
+        - welcome_msg
+        - tags
+      properties:
+        api_url:
+          type: string
+          example: 'https://api.minime.club/sosan'
+          description: 'URL of AI API - ex: https://api.minime.club/sosan'
+        avatar:
+          type: string
+          example: 'https://url_of.cdn'
+          description: avatar image URL
+        bot_alias:
+          type: string
+        description:
+          type: string
+        short_description:
+          type: string
+        meta_title:
+          type: string
+          example: SimplySosan MiniMe
+        meta_description:
+          type: string
+        meta_image:
+          type: string
+          example: 'https://networkydev.s3.us-west-2.amazonaws.com/meta/sosan_thumbnail.jpeg'
+        is_online:
+          type: boolean
+        req_status:
+          type: integer
+          example: 1
+          description: '0=new, 1=accepted, 2=declined'
+        welcome_msg:
+          type: string
+          example: bot welcome messages
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/BotTag'
+    RegisterReq:
+      type: object
+      properties:
+        with_bot:
+          type: boolean
+          example: true or false. if true then show the questionaire
+        f_name:
+          type: string
+          example: 'Sosan, susy, johnlee'
+        l_name:
+          type: string
+          example: 'doe, beckham'
+        email:
+          type: string
+          example: mail@mail.com
+        q_best_descibe:
+          type: string
+        q_is_your_own:
+          type: integer
+          example: '1=yes, 0=no, 2=unsure'
+        q_bot_desc:
+          type: string
+          example: tell about bot description
+    RegisterResp:
+      type: object
+      properties:
+        token:
+          type: string
+          example: JWT auth token
+        profile:
+          $ref: '#/components/schemas/ProfileResp'
+    AdminLoginReq:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          example: mail@mail.com
+        password:
+          type: string
+    AdminLoginResp:
+      type: object
+      properties:
+        token:
+          type: string
+          example: JWT auth token
+    ProfileResp:
+      type: object
+      properties:
+        f_name:
+          type: string
+          example: 'Sosan, susy, johnlee'
+        l_name:
+          type: string
+          example: 'doe, beckham'
+        email:
+          type: string
+          example: mail@mail.com
+        bots:
+          type: array
+          items:
+            $ref: '#/components/schemas/BotResp'
+    InitConvResp:
+      type: object
+      properties:
+        conv_code:
+          type: string
+        cent_token:
+          type: string
+          example: centrifugo
+    ConvResp:
+      type: object
+      properties:
+        conv_code:
+          type: string
+        creator_code:
+          type: string
+          example: creator code
+        creator_name:
+          type: string
+          example: creator name of bot
+        creator_img:
+          type: string
+        latest_msg:
+          type: string
+          example: the latest message in conversation channel
+        remaining:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          example: start date
+    ConvArrResp:
+      type: object
+      properties:
+        bot:
+          $ref: '#/components/schemas/BotResp'
+        conversations:
+          type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConvResp'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+    MsgReq:
+      type: object
+      properties:
+        content:
+          type: string
+        content_type:
+          type: string
+    MsgArrResp:
+      type: object
+      properties:
+        conversation:
+          $ref: '#/components/schemas/ConvResp'
+        messages:
+          type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/MsgResp'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+    MsgResp:
+      type: object
+      properties:
+        msg_code:
+          type: string
+          example: code of message
+        sender_code:
+          type: string
+          example: user that send the message
+        sender_type:
+          type: string
+          example: 'user, admin, bot'
+        sender_name:
+          type: string
+        sender_img:
+          type: string
+        content:
+          type: string
+        content_type:
+          type: string
+        created_at:
+          type: string
+        rating:
+          type: integer
+        feedback:
+          type: string
+        feedback_desc:
+          type: string
+    MsgFeebackReq:
+      type: object
+      properties:
+        feedback:
+          type: string
+        feedback_desc:
+          type: string
+    MsgRatingReq:
+      type: object
+      properties:
+        value:
+          type: integer
+    MainBotResp:
+      type: object
+      properties:
+        code:
+          type: string
+          example: BOT-001
+        name:
+          type: string
+          example: 'Sosan, susy, johnlee'
+        bot_alias:
+          type: string
+        avatar:
+          type: string
+          example: 'https://url_of.cdn'
+        api_url:
+          type: string
+          example: 'https://api.minime.club/sosan'
+        description:
+          type: string
+        short_description:
+          type: string
+        meta_title:
+          type: string
+          example: SimplySosan MiniMe
+        meta_description:
+          type: string
+        meta_image:
+          type: string
+          example: 'https://networkydev.s3.us-west-2.amazonaws.com/meta/sosan_thumbnail.jpeg'
+        is_online:
+          type: boolean
+        is_featured_bot:
+          type: boolean
+        welcome_msg:
+          type: string
+          example: bot welcome messages
+        created_at:
+          type: string
+          example: '2024-01-01 12:59:00'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/BotTag'
+    ChatHistoryBotResp:
+      type: object
+      properties:
+        conv_code:
+          type: string
+          example: CONV-001
+        bot_code:
+          type: string
+        name:
+          type: string
+          example: 'Sosan, susy, johnlee'
+        avatar:
+          type: string
+          example: 'https://url_of.cdn'
+        bot_alias:
+          type: string
+        creator:
+          type: string
+          example: budi
+        remaining:
+          type: string
+        latest_msg_at:
+          type: string
+          example: '2024-01-01 12:59:00'
+        created_at:
+          type: string
+          example: '2024-01-01 12:59:00'
+    TagsResp:
+      $ref: '#/components/schemas/BotTag'
+    SubscribePlanReq:
+      type: object
+      required:
+        - bot_code
+        - bot_types
+        - plan
+        - plan_names
+        - price
+        - is_active
+      properties:
+        bot_code:
+          type: string
+          description: Code of the bot
+        bot_types:
+          type: string
+          description: 'Types of the bot, either bot or main bot'
+        plan_names:
+          type: string
+          description: Name of the subscription plan
+        plan:
+          type: integer
+          description: Subscription plan duration
+          example: 7
+        price:
+          type: number
+          format: float
+          description: Price of the subscription plan
+          example: 19.99
+        is_active:
+          type: boolean
+          description: Status indicating whether the subscription plan is active
+          example: true
+    SubscribePlanResp:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        bot_code:
+          type: string
+          description: A unique code representing the bot
+        bot_types:
+          type: string
+        plan_names:
+          type: string
+          description: Name of the subscription plan
+        plan:
+          type: integer
+          example: 7
+          description: Subscription plan duration in days
+        price:
+          type: number
+          format: float
+          example: 19.99
+          description: Price of the subscription plan in decimal format
+        is_active:
+          type: boolean
+          default: true
+          description: Whether the subscription plan is active
+        created_at:
+          type: string
+          example: '2024-01-01T12:00:00Z'
+          description: Timestamp when the subscription plan was created
+        updated_at:
+          type: string
+          example: '2024-01-01T12:00:00Z'
+          description: Timestamp for the last update of the subscription plan
+    CheckUserSubscriptionResp:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the subscription record
+          example: 1
+        profiles_code:
+          type: string
+          description: Code of the profile associated with the subscription
+        amount:
+          type: number
+          format: float
+          description: Amount paid for the subscription
+          example: 19.99
+        bot_code:
+          type: string
+          description: Code of the bot
+        bot_types:
+          type: string
+          description: 'Types of the bot, either bot or main bot'
+        payment_date:
+          type: string
+          format: date-time
+          description: Timestamp when the payment was made
+          example: '2024-09-17T12:34:56Z'
+        stripe_payment_id:
+          type: string
+          description: Stripe payment identifier for tracking the transaction
+          example: pi_1F5GSUBXwfi33K
+        transaction_id:
+          type: string
+          description: Stripe payment identifier for tracking the transaction
+        plan:
+          type: integer
+          example: 1
+        plan_names:
+          type: string
+        subscribe_plan_status:
+          type: boolean
+          description: Status indicating whether the subscription plan is active
+          example: true
+        start_time:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the subscription starts
+          example: '2024-09-17T00:00:00Z'
+        end_time:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the subscription ends
+          example: '2024-10-17T00:00:00Z'
+        status:
+          type: string
+          description: 'Status of the subscription, e.g., success, pending, failed'
+          example: success
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the subscription record was created
+          example: '2024-09-17T12:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the subscription record was last updated
+          example: '2024-09-17T12:30:00Z'
+    UserSubscriptionReq:
+      type: object
+      required:
+        - profiles_code
+        - amount
+        - status
+      properties:
+        profiles_code:
+          type: string
+          description: Code of the profile associated with the subscription
+        amount:
+          type: number
+          format: float
+          description: Amount paid for the subscription
+          example: 19.99
+        bot_code:
+          type: string
+          description: Code of the bot
+        bot_types:
+          type: string
+          description: 'Types of the bot, either bot or main bot'
+        payment_date:
+          type: string
+          format: date-time
+          description: Timestamp when the payment was made
+          example: '2024-09-17T12:34:56Z'
+        plan_names:
+          type: string
+        stripe_payment_id:
+          type: string
+          description: Stripe payment identifier for tracking the transaction
+        transaction_id:
+          type: string
+          description: Payment identifier for tracking the transaction
+        start_time:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the subscription starts
+          example: '2024-09-17T00:00:00Z'
+        end_time:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the subscription ends
+          example: '2024-10-17T00:00:00Z'
+        status:
+          type: string
+          description: 'Status of the subscription, e.g., success, pending, failed'
+        plan:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the subscription record was created
+          example: '2024-09-17T12:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the subscription record was last updated
+          example: '2024-09-17T12:30:00Z'
+    UserSubscriptionResp:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the subscription record
+          example: 1
+        profiles_code:
+          type: string
+          description: Code of the profile associated with the subscription
+        amount:
+          type: number
+          format: float
+          description: Amount paid for the subscription
+          example: 19.99
+        bot_code:
+          type: string
+          description: Code of the bot
+        bot_types:
+          type: string
+          description: 'Types of the bot, either bot or main bot'
+        payment_date:
+          type: string
+          format: date-time
+          description: Timestamp when the payment was made
+          example: '2024-09-17T12:34:56Z'
+        stripe_payment_id:
+          type: string
+          description: Stripe payment identifier for tracking the transaction
+          example: pi_1F5GSUBXwfi33K
+        transaction_id:
+          type: string
+          description: Stripe payment identifier for tracking the transaction
+        plan:
+          type: integer
+          example: 1
+        plan_names:
+          type: string
+        start_time:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the subscription starts
+          example: '2024-09-17T00:00:00Z'
+        end_time:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the subscription ends
+          example: '2024-10-17T00:00:00Z'
+        status:
+          type: string
+          description: 'Status of the subscription, e.g., success, pending, failed'
+          example: success
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the subscription record was created
+          example: '2024-09-17T12:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the subscription record was last updated
+          example: '2024-09-17T12:30:00Z'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    Other200:
+      description: other than 200
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - stat_code
+              - stat_msg
+              - pagination
+              - data
+            properties:
+              stat_code:
+                type: string
+                example: 'ERR:BAD_REQUEST | ERR:VALIDATION | ERR:AUTHENTICATION'
+              stat_msg:
+                type: string
+                example: can be a custom message
+              data:
+                type: object
+    Other401:
+      description: authorization error response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - stat_code
+              - stat_msg
+              - pagination
+              - data
+            properties:
+              stat_code:
+                type: string
+                example: 'ERR:AUTHORIZATION'
+              stat_msg:
+                type: string
+                example: Access token is missing or invalid
+              data:
+                type: object
